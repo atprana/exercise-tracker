@@ -1,19 +1,14 @@
 const { default: mongoose, models } = require("mongoose");
 
-const UserSchema = mongoose.Schema ({
+const UserSchema = mongoose.Schema({
     username: String,
-    description: String,
-    duration: Number,
-    date: String,
-    count:Number,
-    log: {
-        alias: 'exercises',
-        type:
-        [{
-         description: String,
-         duration: Number,
-         date: String
-    }]}
+    log: [
+        {
+            description: String,
+            duration: Number,
+            date: String
+        }
+    ]
 })
 
 

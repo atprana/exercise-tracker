@@ -33,7 +33,6 @@ const createUser = async (req, res) => {
 @access Private 
 -----------------*/
 const createExercises = async (req, res) => {
-    // console.log(req.params.id)
     let user = await User.findById(req.params.id)
     if (!user) {
         res.status(400)
@@ -48,43 +47,65 @@ const createExercises = async (req, res) => {
     // this format is essential to PASS the TEST !!!
     const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString()
 
-    user.description = req.body.description
-    user.duration = req.body.duration
-    user.date = date
+    // user.description = req.body.description
+    // user.duration = req.body.duration
+    // user.date = date
 
     user.log.push({
         description: req.body.description,
         duration: req.body.duration,
         date: date
     })
-    user.count = user.log.length
+    const count = user.log.length -1
+
     await user.save()
   
     res.status(200).json({
         _id: user._id,
         username: user.username,
-        description: user.description,
-        duration: user.duration,
-        date: user.date
+        description: user.log[count].description,
+        duration: user.log[count].duration,
+        date:  date
     })
 }
 
-
-/* -------------- 
-@desc GET  Exercises log 
+/* ---------------------------- 
+@desc GET User Exercises log 
 @route /api/users/:id/log
 @access Private 
------------------*/
+-------------------------------*/
 const userLog = async (req, res) => {
-    const user = await User.findById(req.params.id)
-        .select({ username: 1, count: 1, _id: 1, log: 1 })
+    let from = req.query.from
+    let to = req.query.to
+    let limit = parseInt(req.query.limit)  
+    const userId = req.params.id
+
+    const user = await User.findById(userId)
+    .select({ username: 1, _id: 1, log: 1 })
     if (!user) {
         res.status(400)
         throw new Error('User not found!')
     }
-
-    res.json(user)
-
+    
+    if (from) {
+        user.log = user.log.filter( val => new Date(val.date) > new Date(from))
+    }
+    if (to) {
+        user.log = user.log.filter( val => new Date(val.date) < new Date(to))
+    }
+    if (limit){
+        user.log = user.log.slice(0, limit)
+    } 
+    
+    const userlog = {
+        _id: userId,
+        username: user.username ,
+        count: user.log.length,
+        log: user.log
+    }
+    
+    res.json (userlog)
+     
 }
 
 
