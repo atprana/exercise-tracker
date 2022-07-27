@@ -47,10 +47,6 @@ const createExercises = async (req, res) => {
     // this format is essential to PASS the TEST !!!
     const date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString()
 
-    // user.description = req.body.description
-    // user.duration = req.body.duration
-    // user.date = date
-
     user.log.push({
         description: req.body.description,
         duration: req.body.duration,
